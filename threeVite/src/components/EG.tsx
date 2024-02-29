@@ -264,9 +264,9 @@ export const EG = () => {
                 Evan Geer
               </span>
             </div>
-            <div className="d-flex pe-3 text-light align-items-center">
+            <div className="d-flex m-0 p-0 h4 pe-3 text-light align-items-center">
               {/* <Button className="p-0 rounded-circle m-0"> */}
-              <span className="opacity-50 me-2 h4 mt-2">contact:</span>
+              <span className="opacity-25 me-2 d-none d-sm-flex">contact:</span>
               <Linkedin className="m-2" />
               {/* </Button> */}
               <Github className="m-2" />
