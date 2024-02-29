@@ -1,16 +1,32 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLoader, Canvas, useFrame } from "@react-three/fiber";
 import { Euler, Mesh, MeshStandardMaterial, Vector3 } from "three";
-import { Center, OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import {
+  Center,
+  CycleRaycast,
+  OrbitControls,
+  PerspectiveCamera,
+} from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
-import { Modal } from "react-bootstrap";
+import { Button, Modal, Spinner } from "react-bootstrap";
+import {
+  Github,
+  Linkedin,
+  Medium,
+  StackOverflow,
+  XLg,
+} from "react-bootstrap-icons";
 
 function Scene({
   objFile,
   rotation,
+  onClick,
+  onHover,
 }: {
   objFile: string;
   rotation: [number, number, number];
+  onClick?: () => void;
+  onHover?: (hovered: boolean) => void;
 }) {
   const [scale, setScale] = useState(1);
   const [hovered, setHover] = useState(false);
@@ -33,6 +49,7 @@ function Scene({
   }
 
   useEffect(() => {
+    // if (onClick === undefined) return;
     obj.traverse(function (child: Mesh) {
       const texture = new MeshStandardMaterial();
       texture.metalness = 0.7;
@@ -40,21 +57,24 @@ function Scene({
       // texture.color.set("#00FF00");
       texture.opacity = 0;
       // texture.wireframe = true;
-      texture.color.set(hovered ? "orange" : undefined);
+      texture.color.set(
+        onClick ? (hovered ? "#81bffc" : "#97cafc") : undefined
+      );
       // texture.met
       if (child.isMesh) {
         child.material = texture;
       }
     });
+    if (onHover) onHover(hovered);
   }, [hovered]);
 
   return (
     <mesh
-      onClick={() => setScale(scale === 1 ? 2 : 1)}
+      onClick={onClick}
       onPointerOver={() => setHover(true)}
-      onPointerOut={(event) => setHover(false)}
+      onPointerOut={() => setHover(false)}
     >
-      <primitive object={obj} />
+      <primitive object={obj} style={{ cursor: "pointer" }} />
       {/* <meshStandardMaterial color={"red"} /> */}
     </mesh>
   );
@@ -117,11 +137,25 @@ function Timeline(props: any) {
 export const EG = () => {
   // const [cameraPos, setCameraPos] = useState(new Vector3(-5, 5, 7));
   // console.log("rendering", cameraPos);
+  const [show, setShow] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [cursor, setCursor] = useState("default");
+
+  const onHover = (hovered: boolean) => {
+    setCursor(hovered ? "pointer" : "default");
+  };
 
   return (
     <>
-      <Modal show={false}>
-        <Modal.Title>TEST</Modal.Title>
+      <Modal show={show} onExit={() => setShow(false)}>
+        <Modal.Title onClick={() => setShow(false)}>
+          <div>
+            TEST
+            <Button variant="outline">
+              <XLg />
+            </Button>
+          </div>
+        </Modal.Title>
       </Modal>
       <div
         style={{
@@ -130,9 +164,26 @@ export const EG = () => {
           height: "100vh",
           margin: "auto",
         }}
-        className="bg-dark"
+        className="bg-dark d-flex justify-content-top"
       >
+        {!loaded && (
+          <>
+            <div
+              className="display-2 d-flex m-auto w-100 h-100 text-secondary align-items-center justify-content-center"
+              style={{ position: "absolute" }}
+            >
+              <div className="display-2">Loading</div>
+              <div className="d-flex text-secondary h5 mt-4">
+                <Spinner size="sm" animation="grow" className="ms-4" />
+                <Spinner size="sm" animation="grow" className="ms-4" />
+                <Spinner size="sm" animation="grow" className="ms-4" />
+              </div>
+            </div>
+          </>
+        )}
         <Canvas
+          style={{ cursor }}
+          onCreated={() => setLoaded(true)}
           // onCreated={(state) => {
           //   state.camera.position.set(-7, 11, 10);
           //   // state.camera.lookAt(0,-10,-100);
@@ -146,7 +197,7 @@ export const EG = () => {
             decay={0}
             intensity={Math.PI}
           />
-          <PerspectiveCamera position={[-7, 11, 10]} makeDefault />
+          <PerspectiveCamera position={[-5, 5, 7]} makeDefault />
           <pointLight
             position={[-10, -10, -10]}
             decay={0}
@@ -158,10 +209,72 @@ export const EG = () => {
               objFile="../ProjectPiping.obj"
               rotation={[-Math.PI / 2, 0, 0]}
             />
+            <Scene
+              onClick={() => setShow(true)}
+              onHover={onHover}
+              objFile="../Personal.obj"
+              rotation={[-Math.PI / 2, 0, 0]}
+            />
+            <Scene
+              onClick={() => setShow(true)}
+              onHover={onHover}
+              objFile="../BIMDexter.obj"
+              rotation={[-Math.PI / 2, 0, 0]}
+            />
+            <Scene
+              onClick={() => setShow(true)}
+              onHover={onHover}
+              objFile="../BrownAndCaldwell.obj"
+              rotation={[-Math.PI / 2, 0, 0]}
+            />
+            <Scene
+              onClick={() => setShow(true)}
+              onHover={onHover}
+              objFile="../MSUITE.obj"
+              rotation={[-Math.PI / 2, 0, 0]}
+            />
+            <Scene
+              onClick={() => setShow(true)}
+              onHover={onHover}
+              objFile="../KitConnect.obj"
+              rotation={[-Math.PI / 2, 0, 0]}
+            />
+            <Scene
+              onClick={() => setShow(true)}
+              onHover={onHover}
+              objFile="../DeWalt.obj"
+              rotation={[-Math.PI / 2, 0, 0]}
+            />
           </Center>
           {/* <Timeline position={[0, -1, 3]} /> */}
           <OrbitControls onEnd={(e) => console.log(e)} />
         </Canvas>
+        <div
+          className="h3 d-flex p-3 overflow-none  w-100 align-self-top mb-auto align-items-center"
+          style={{ position: "absolute" }}
+        >
+          <div className="bg-light d-flex rounded-5 text-dark w-100 align-self-top mb-auto align-items-center bg-opacity-25">
+            <div className="d-flex text-dark w-100 align-items-center">
+              <img
+                src="https://avatars.githubusercontent.com/u/49009980?v=4"
+                height={40}
+                className="rounded-circle m-1"
+              />
+              <span className="text-light display-6 ps-5 ms-1 pb-1 position-absolute">
+                Evan Geer
+              </span>
+            </div>
+            <div className="d-flex pe-3 text-light align-items-center">
+              {/* <Button className="p-0 rounded-circle m-0"> */}
+              <span className="opacity-50 me-2 h4 mt-2">contact:</span>
+              <Linkedin className="m-2" />
+              {/* </Button> */}
+              <Github className="m-2" />
+              <StackOverflow className="m-2" />
+              <Medium className="m-2" />
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
